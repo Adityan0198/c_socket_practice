@@ -14,15 +14,12 @@
 #define PORT "3005" 
 
 int main(){
-    struct sockaddr_in* addr;
     struct addrinfo hint;
 
     memset(&hint, 0, sizeof hint);
     hint.ai_family = AF_UNSPEC;
     hint.ai_socktype = SOCK_STREAM;
     hint.ai_flags = AI_PASSIVE;
-    hint.ai_addr = (struct sockaddr*) addr;
-
 
     struct addrinfo *servinfo;
 
@@ -32,6 +29,20 @@ int main(){
         return 1;
     }
 
+    int sockfd;
+    //Find what we can bind to in servinfo
+    for (struct addrinfo* p = servinfo; p != NULL; p = p->ai_next){
+        //If couldn't get socket
+        if (sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol) == -1){
+            perror("socket Error");
+        } else if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+            perror("Bind Error");
+        } else {
+            break;
+        }
+    }
+
+    freeaddrinfo(servinfo); //done with it
 
     return 0;
 }
